@@ -1,0 +1,25 @@
+{
+  "timezone": "Asia/Seoul",
+  "servers": {
+    "https://proxmox-01.internal.soohy.uk:8006": {
+      "id": "root@pam!api",
+      "secret": "****",
+      "nodes": {
+        "proxmox-01": [
+          {
+            "type": "lxc",
+            "id": 106,
+            "sched": {
+              "23:00": {
+                "net0": 0,
+              },
+              "7:00": {
+                "net0": 7
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

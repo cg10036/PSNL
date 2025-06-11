@@ -1,0 +1,17 @@
+{
+  "name": "psnl",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.12",
+    "node-cron": "^4.1.0",
+    "node-fetch": "^2.7.0"
+  }
+}
