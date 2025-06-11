@@ -83,45 +83,70 @@ class ProxmoxClient {
   async getCurrentConfig(
     nodeName: string,
     type: string,
-    vmId: number
+    vmId: number,
+    retry: number = 5
   ): Promise<any> {
-    const url = this.getConfigUrl(nodeName, type, vmId);
-    const response = await fetch(url, {
-      method: "GET",
-      headers: this.headers,
-    });
+    try {
+      const url = this.getConfigUrl(nodeName, type, vmId);
+      const response = await fetch(url, {
+        method: "GET",
+        headers: this.headers,
+      });
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to get config: ${response.status} ${response.statusText}`
-      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to get config: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const { data } = await response.json();
+
+      if (!data) {
+        throw new Error(`No data found for ${url}`);
+      }
+
+      return data;
+    } catch (e) {
+      Logger.error(`Failed to get config: ${e}`, e);
+      if (retry > 0) {
+        Logger.info(`Retrying... ${retry} times`);
+        return this.getCurrentConfig(nodeName, type, vmId, retry - 1);
+      }
+      throw e;
     }
-
-    const { data } = await response.json();
-    return data;
   }
 
   async updateConfig(
     nodeName: string,
     type: string,
     vmId: number,
-    config: object
+    config: object,
+    retry: number = 5
   ): Promise<boolean> {
-    const url = this.getConfigUrl(nodeName, type, vmId);
-    const response = await fetch(url, {
-      method: "PUT",
-      headers: this.headers,
-      body: JSON.stringify(config),
-    });
+    try {
+      const url = this.getConfigUrl(nodeName, type, vmId);
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: this.headers,
+        body: JSON.stringify(config),
+      });
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to update config: ${response.status} ${response.statusText}`
-      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to update config: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const { data } = await response.json();
+      return data === null;
+    } catch (e) {
+      Logger.error(`Failed to update config: ${e}`, e);
+      if (retry > 0) {
+        Logger.info(`Retrying... ${retry} times`);
+        return this.updateConfig(nodeName, type, vmId, config, retry - 1);
+      }
+      return false;
     }
-
-    const { data } = await response.json();
-    return data === null;
   }
 }
 
